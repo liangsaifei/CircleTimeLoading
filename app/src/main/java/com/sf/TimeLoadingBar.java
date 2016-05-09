@@ -23,31 +23,20 @@ public class TimeLoadingBar extends View {
     private Paint circlePaint;
     private Paint minutePaint;
     private Paint hourPaint;
-
     private int strokeWidth = 6;
     private float defaultSize;
-
     private int mWidth;
-
     private int centerX;
     private int centerY;
-
-    private float minuteEndDegree = 360f;
     private float hourEndDegree = 30f;
     private float lastHourDegree = 0f;
     private float currMinuteDegree = 0f;
-
     private float currHourDegree = 0f;
-
-
     private ValueAnimator mMinuteValueAnimator;
     private ValueAnimator mHourValueAnimator;
     private int count = 1;
-
-    private int hourColor;
-    private int minuteColor;
     private long duration;
-    private int circleColor;
+
 
     public TimeLoadingBar(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -59,11 +48,11 @@ public class TimeLoadingBar extends View {
                 getContext().getResources().getDisplayMetrics());
 
         TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.TimeLoadingBar);
-        hourColor = ta.getColor(R.styleable.TimeLoadingBar_hour_color, Color.GRAY);
-        minuteColor = ta.getColor(R.styleable.TimeLoadingBar_minute_color, Color.GRAY);
-        circleColor = ta.getColor(R.styleable.TimeLoadingBar_circle_color, Color.GRAY);
+        int hourColor = ta.getColor(R.styleable.TimeLoadingBar_hour_color, Color.GRAY);
+        int minuteColor = ta.getColor(R.styleable.TimeLoadingBar_minute_color, Color.GRAY);
+        int circleColor = ta.getColor(R.styleable.TimeLoadingBar_circle_color, Color.GRAY);
         duration = (long) ta.getInteger(R.styleable.TimeLoadingBar_duration, 3000);
-
+        ta.recycle();
 
         circlePaint = simplePaint(circleColor);
         circlePaint.setStrokeWidth(strokeWidth);
@@ -92,7 +81,7 @@ public class TimeLoadingBar extends View {
     }
 
     private void initMinuteAnimator() {
-        mMinuteValueAnimator = simpleAnimator(0f, minuteEndDegree);
+        mMinuteValueAnimator = simpleAnimator(0f, 360f);
         mMinuteValueAnimator.addListener(new Animator.AnimatorListener() {
             @Override
             public void onAnimationStart(Animator animation) {
@@ -146,15 +135,11 @@ public class TimeLoadingBar extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         canvas.drawCircle(centerX, centerY, (mWidth - strokeWidth) / 2, circlePaint);
-
-        canvas.save();
         canvas.rotate(currMinuteDegree, centerX, centerY);
-        canvas.drawLine(centerX, centerY, centerX - strokeWidth, strokeWidth, minutePaint);
+        canvas.drawLine(centerX, centerY, centerX, centerY / 5, minutePaint);
         canvas.rotate(-currMinuteDegree, centerX, centerY);
         canvas.rotate(lastHourDegree + currHourDegree, centerX, centerY);
-        canvas.drawLine(centerX, centerY, centerX, strokeWidth, hourPaint);
-        canvas.restore();
-
+        canvas.drawLine(centerX, centerY, centerX, centerY / 3, hourPaint);
     }
 
 
