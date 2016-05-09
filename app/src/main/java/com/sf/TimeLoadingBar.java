@@ -168,8 +168,11 @@ public class TimeLoadingBar extends View {
     }
 
     public void start() {
-        mMinuteValueAnimator.start();
-        mHourValueAnimator.start();
+        if (!mMinuteValueAnimator.isStarted()) {
+            mMinuteValueAnimator.start();
+            mHourValueAnimator.start();
+        }
+
     }
 
     public void stop() {

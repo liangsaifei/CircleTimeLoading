@@ -8,15 +8,14 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin">
 
-    <com.sf.TimeLoadingBar
-        android:id="@+id/time_loading_bar"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_centerInParent="true"
-        app:circle_color="@android:color/darker_gray"
-        app:duration="1000"
-        app:hour_color="@android:color/darker_gray"
-        app:minute_color="@android:color/darker_gray" />
+    <com.sf.PullToRefreshListView
+        android:id="@+id/refreshlistview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </com.sf.PullToRefreshListView>
+
+
 
 
 </RelativeLayout>
