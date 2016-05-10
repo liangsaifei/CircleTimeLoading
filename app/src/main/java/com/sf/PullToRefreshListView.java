@@ -48,11 +48,15 @@ public class PullToRefreshListView extends ListView {
                 downY = (int) ev.getY();
                 break;
             case MotionEvent.ACTION_MOVE:
+
                 int moveY = (int) ev.getY();
                 int distance = moveY - downY;
 
                 int marginTop = -headerViewHeight + distance;
                 if (getFirstVisiblePosition() == 0 && distance > 0) {
+                    if (currState == REFRESHING) {
+                        return false;
+                    }
                     if (marginTop > 0 && currState == PULL_TO_REFRESH) {
                         currState = RELEASE_TO_REFRESH;
                     } else if (marginTop < 0 && currState == RELEASE_TO_REFRESH) {
