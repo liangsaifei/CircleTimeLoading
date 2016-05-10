@@ -136,7 +136,7 @@ public class TimeLoadingBar extends View {
         super.onDraw(canvas);
         canvas.drawCircle(centerX, centerY, (mWidth - strokeWidth) / 2, circlePaint);
         canvas.rotate(currMinuteDegree, centerX, centerY);
-        canvas.drawLine(centerX, centerY, centerX, centerY / 5, minutePaint);
+        canvas.drawLine(centerX, centerY, centerX, centerY / 4, minutePaint);
         canvas.rotate(-currMinuteDegree, centerX, centerY);
         canvas.rotate(lastHourDegree + currHourDegree, centerX, centerY);
         canvas.drawLine(centerX, centerY, centerX, centerY / 3, hourPaint);
