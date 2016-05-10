@@ -4,15 +4,10 @@ import android.content.Context;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AbsListView;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 /**
- * Created by Administrator on 2016/5/9 0009.
+ * @author Saifei
  */
 public class PullToRefreshListView extends ListView {
 
@@ -24,10 +19,7 @@ public class PullToRefreshListView extends ListView {
     private int currState = PULL_TO_REFRESH;
 
     private int headerViewHeight;
-    private View headerView;
-    private TimeLoadingBar timeLoadingBar;
-    private TextView stateTv;
-    private RelativeLayout.LayoutParams params;
+    private HeaderView headerView;
 
 
     public PullToRefreshListView(Context context, AttributeSet attrs) {
@@ -36,26 +28,12 @@ public class PullToRefreshListView extends ListView {
     }
 
     private void init(Context context, AttributeSet attrs) {
-
-
-        initHeaderView();
-
-
+        initHeaderView(context);
     }
 
-    private void initHeaderView() {
-        View view = View.inflate(getContext(), R.layout.header, null);
-        headerView = view.findViewById(R.id.header_view);
-        timeLoadingBar = (TimeLoadingBar) headerView.findViewById(R.id.time_loading_bar);
-        stateTv = (TextView) headerView.findViewById(R.id.state_tv);
-        headerView.measure(0, 0);
-        headerViewHeight = headerView.getMeasuredHeight();
-        params = (RelativeLayout.LayoutParams) headerView.getLayoutParams();
-        params.setMargins(0, -headerViewHeight, 0, 0);
-        headerView.setLayoutParams(params);
-//        headerView.setPadding(0, -headerViewHeight, 0, 0);
-        timeLoadingBar.start();
-
+    private void initHeaderView(Context context) {
+        headerView = new HeaderView(context);
+        headerViewHeight = headerView.getHeaderHeight();
         addHeaderView(headerView);
     }
 
@@ -71,23 +49,17 @@ public class PullToRefreshListView extends ListView {
                 break;
             case MotionEvent.ACTION_MOVE:
                 int moveY = (int) ev.getY();
-                int diff = moveY - downY;
+                int distance = moveY - downY;
 
-                int marginTop = (-headerViewHeight + diff);
-                if (getFirstVisiblePosition() == 0 && marginTop <= 0) {
-                    System.out.println("headerViewHeight:" + headerViewHeight + "|marginTop:" + marginTop);
+                int marginTop = -headerViewHeight + distance;
+                if (getFirstVisiblePosition() == 0 && distance > 0) {
                     if (marginTop > 0 && currState == PULL_TO_REFRESH) {
-                        System.out.println("松开就可以刷新");
-                        refreshHeaderView();
                         currState = RELEASE_TO_REFRESH;
                     } else if (marginTop < 0 && currState == RELEASE_TO_REFRESH) {
-                        System.out.println("下拉去刷新");
-                        refreshHeaderView();
                         currState = PULL_TO_REFRESH;
                     }
-
-
-                    setMargins(headerView, 0, marginTop, 0, 0);
+                    refreshHeaderView();
+                    headerView.setMarginTop(marginTop);
                     return true;
                 }
 
@@ -96,8 +68,8 @@ public class PullToRefreshListView extends ListView {
             case MotionEvent.ACTION_UP:
                 if (currState == RELEASE_TO_REFRESH) {
                     currState = REFRESHING;
-                    System.out.println("刷新中");
-                    setMargins(headerView, 0, 0, 0, 0);
+
+                    headerView.show();
                     refreshHeaderView();
 
                     if (mOnRefreshListener != null) {
@@ -106,8 +78,7 @@ public class PullToRefreshListView extends ListView {
 
 
                 } else if (currState == PULL_TO_REFRESH) {
-                    System.out.println("下拉可以刷新，松开手指");
-                    setMargins(headerView, 0, -headerViewHeight, 0, 0);
+                    headerView.hide();
 
                 }
                 break;
@@ -126,24 +97,19 @@ public class PullToRefreshListView extends ListView {
         switch (currState) {
             case PULL_TO_REFRESH:
 
-                stateTv.setText("下拉刷新");
+                headerView.setStateText("下拉刷新");
 
                 break;
             case RELEASE_TO_REFRESH:
-                stateTv.setText("松手刷新");
+                headerView.setStateText("释放刷新");
 
                 break;
             case REFRESHING:
-                stateTv.setText("刷新中");
+                headerView.setStateText("刷新中");
                 break;
         }
     }
 
-
-    interface OnRefreshListener {
-        public void onRefresh();
-
-    }
 
     SwipeRefreshLayout.OnRefreshListener mOnRefreshListener;
 
@@ -153,22 +119,9 @@ public class PullToRefreshListView extends ListView {
     }
 
     public void hideHeaderView() {
-        headerView.setPadding(0, -headerViewHeight, 0, 0);
         currState = PULL_TO_REFRESH;
-        stateTv.setText("下拉刷新");
-    }
-
-    public static void setMargins(View v, int l, int t, int r, int b) {
-        if (v.getLayoutParams() instanceof ViewGroup.MarginLayoutParams) {
-            ViewGroup.MarginLayoutParams p = (ViewGroup.MarginLayoutParams) v.getLayoutParams();
-            p.setMargins(l, t, r, b);
-            v.requestLayout();
-        }
+        headerView.hide();
     }
 
 
-    @Override
-    protected ViewGroup.LayoutParams generateLayoutParams(ViewGroup.LayoutParams p) {
-        return new MarginLayoutParams(p);
-    }
 }

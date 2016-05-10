@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,21 +22,21 @@ public class MainActivity extends Activity implements SwipeRefreshLayout.OnRefre
 
     private List<String> textList;
     private MyAdapter adapter;
-    private PullToRefreshListView rListView;
+    private PullToRefreshListView listView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_test_time_loading);
 
-        rListView = (PullToRefreshListView) findViewById(R.id.refreshlistview);
-        textList = new ArrayList<String>();
+        listView = (PullToRefreshListView) findViewById(R.id.refreshlistview);
+        textList = new ArrayList();
         for (int i = 0; i < 25; i++) {
             textList.add("这是一条ListView的数据" + i);
         }
         adapter = new MyAdapter();
-        rListView.setAdapter(adapter);
-        rListView.setOnRefreshListener(this);
+        listView.setAdapter(adapter);
+        listView.setOnRefreshListener(this);
     }
 
     @Override
@@ -44,7 +45,7 @@ public class MainActivity extends Activity implements SwipeRefreshLayout.OnRefre
 
             @Override
             protected Void doInBackground(Void... params) {
-                SystemClock.sleep(2000);
+                SystemClock.sleep(1000);
                 for (int i = 0; i < 2; i++) {
                     textList.add(0, "这是下拉刷新出来的数据" + i);
                 }
@@ -54,9 +55,11 @@ public class MainActivity extends Activity implements SwipeRefreshLayout.OnRefre
             @Override
             protected void onPostExecute(Void result) {
                 adapter.notifyDataSetChanged();
-                rListView.hideHeaderView();
+                listView.hideHeaderView();
+                Toast.makeText(MainActivity.this, "刷新完成，当前数据条数:" + textList.size(), Toast.LENGTH_SHORT).show();
+
             }
-        }.execute(new Void[]{});
+        }.execute();
     }
 
     private class MyAdapter extends BaseAdapter {
@@ -91,29 +94,5 @@ public class MainActivity extends Activity implements SwipeRefreshLayout.OnRefre
 
     }
 
-
-
-    public void onLoadingMore() {
-        new AsyncTask<Void, Void, Void>() {
-
-            @Override
-            protected Void doInBackground(Void... params) {
-                SystemClock.sleep(5000);
-
-                textList.add("这是加载更多出来的数据1");
-                textList.add("这是加载更多出来的数据2");
-                textList.add("这是加载更多出来的数据3");
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(Void result) {
-                adapter.notifyDataSetChanged();
-
-                // 控制脚布局隐藏
-//                rListView.hideFooterView();
-            }
-        }.execute(new Void[]{});
-    }
 
 }
