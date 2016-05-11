@@ -52,7 +52,7 @@ public class PullToRefreshListView extends ListView {
                 int moveY = (int) ev.getY();
                 int distance = moveY - downY;
 
-                int marginTop = -headerViewHeight + distance;
+                int marginTop = -headerViewHeight + distance/3;
                 if (getFirstVisiblePosition() == 0 && distance > 0) {
                     if (currState == REFRESHING) {
                         return false;
